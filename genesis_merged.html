@@ -345,7 +345,9 @@ const S = {
 };
 
 const DEFAULT_PW = 'G3n3$1s_Pr0!2026xQ';
-const API = '';  // same origin backend
+// API Base URL - غيّرها لـ Render URL بعد النشر
+// مثال: const API = 'https://genesis-video.onrender.com';
+const API = '';
 
 /* ═══════════════════════════════════════════
    AUTH
@@ -800,12 +802,13 @@ function replayPreview() {
    REPLICATE BACKEND CALLS
 ═══════════════════════════════════════════ */
 async function startReplicateJob(prompt, w, h, secs, fps, mode) {
-  const url = mode === 'both' ? '/api/generate-dual' : '/api/generate';
+  const url = (mode === 'both' ? '/api/generate-dual' : '/api/generate');
+  const fullUrl = API ? API + url : url;
   const body = {
     prompt, width: w, height: h, seconds: secs, fps, mode,
     api_key: S.apiKey,
   };
-  const r = await fetch(url, {
+  const r = await fetch(fullUrl, {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify(body),
@@ -818,7 +821,8 @@ function pollJob(jobId) {
   if (S.pollTimer) clearInterval(S.pollTimer);
   S.pollTimer = setInterval(async () => {
     try {
-      const r = await fetch(`/api/status/${jobId}`);
+      const statusUrl = API ? API + '/api/status/' + jobId : '/api/status/' + jobId;
+      const r = await fetch(statusUrl);
       const d = await r.json();
       if (d.status === 'processing') {
         setStatus(`⏳ Replicate يعمل... ${d.progress || ''}`, 'go');
