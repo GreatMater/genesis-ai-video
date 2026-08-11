@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GENESIS · AI Video Studio Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#06080f;--s1:#0b1220;--s2:#101a2e;--s3:#16243e;
+  --b:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.11);--b3:rgba(255,255,255,0.18);
+  --cyan:#00d4ff;--cg:rgba(0,212,255,0.12);--cg2:rgba(0,212,255,0.06);
+  --violet:#7c3aed;--vg:rgba(124,58,237,0.13);
+  --text:#e2e8f0;--soft:#94a3b8;--muted:#4a5568;
+  --green:#10b981;--red:#ef4444;--amber:#f59e0b;
+}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden}
+
+/* ══════════════ LOCK SCREEN ══════════════ */
+#lock{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:var(--bg)}
+.lock-orb1,.lock-orb2{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none}
+.lock-orb1{width:500px;height:500px;background:radial-gradient(circle,rgba(124,58,237,.25),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation:orb1 6s ease-in-out infinite}
+.lock-orb2{width:360px;height:360px;background:radial-gradient(circle,rgba(0,212,255,.18),transparent 70%);top:30%;left:60%;transform:translate(-50%,-50%);animation:orb2 8s ease-in-out infinite}
+@keyframes orb1{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.25)}}
+@keyframes orb2{0%,100%{transform:translate(-50%,-50%) scale(1.1) rotate(0deg)}50%{transform:translate(-50%,-50%) scale(0.8) rotate(20deg)}}
+.lock-card{position:relative;z-index:1;background:rgba(11,18,32,.85);backdrop-filter:blur(24px);border:1px solid var(--b3);border-radius:28px;padding:52px 44px 44px;width:390px;text-align:center;box-shadow:0 0 100px rgba(124,58,237,.22),0 0 0 1px rgba(255,255,255,.04)}
+.lock-glyph{font-size:44px;margin-bottom:18px;display:block}
+.lock-wordmark{font-size:30px;font-weight:900;letter-spacing:4px;background:linear-gradient(120deg,var(--cyan) 0%,#a78bfa 60%,var(--cyan) 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 4s linear infinite;margin-bottom:6px}
+@keyframes shimmer{to{background-position:-200% center}}
+.lock-tagline{font-size:13px;color:var(--muted);letter-spacing:.5px;margin-bottom:34px}
+.pw-wrap{position:relative;margin-bottom:10px}
+.pw-input{width:100%;padding:15px 18px;background:rgba(6,8,15,.8);border:1px solid var(--b3);border-radius:14px;color:var(--text);font-size:16px;text-align:center;letter-spacing:6px;outline:none;transition:border-color .25s,box-shadow .25s;font-family:'Space Grotesk',monospace}
+.pw-input:focus{border-color:var(--cyan);box-shadow:0 0 0 4px rgba(0,212,255,.1)}
+.pw-err{height:22px;font-size:13px;color:var(--red);text-align:center;margin-bottom:12px}
+
+/* ══════════════ API SCREEN ══════════════ */
+#api-screen{position:fixed;inset:0;z-index:190;display:flex;align-items:center;justify-content:center;background:rgba(6,8,15,.9);backdrop-filter:blur(8px)}
+.api-card{background:var(--s1);border:1px solid var(--b3);border-radius:24px;padding:40px;width:500px;max-width:95vw;box-shadow:0 24px 64px rgba(0,0,0,.5)}
+.api-head{font-size:22px;font-weight:800;margin-bottom:6px}
+.api-sub{font-size:13px;color:var(--soft);margin-bottom:28px;line-height:1.6}
+.field{margin-bottom:18px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--soft);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+.field input{width:100%;padding:13px 16px;background:var(--bg);border:1px solid var(--b2);border-radius:12px;color:var(--text);font-size:14px;outline:none;transition:border-color .2s;font-family:'Space Grotesk',monospace}
+.field input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,212,255,.08)}
+.field .hint{font-size:12px;color:var(--muted);margin-top:6px}
+
+/* ══════════════ BUTTONS ══════════════ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:13px 24px;border-radius:13px;font-size:15px;font-weight:700;font-family:'Tajawal',sans-serif;cursor:pointer;border:none;transition:all .2s;width:100%}
+.btn-prime{background:linear-gradient(135deg,#0088aa,#5b21b6);color:#fff;position:relative;overflow:hidden}
+.btn-prime::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--cyan),var(--violet));opacity:0;transition:opacity .3s}
+.btn-prime:hover::before{opacity:1}
+.btn-prime span{position:relative;z-index:1}
+.btn-ghost{background:var(--s2);color:var(--text);border:1px solid var(--b2);width:auto;padding:9px 16px;font-size:13px;border-radius:10px}
+.btn-ghost:hover{border-color:var(--cyan);color:var(--cyan);background:var(--cg2)}
+.btn-icon{width:38px;height:38px;padding:0;border-radius:10px;background:var(--s2);border:1px solid var(--b2);color:var(--soft);font-size:16px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .2s;font-family:inherit}
+.btn-icon:hover{border-color:var(--cyan);color:var(--cyan)}
+.btn:disabled,.btn-icon:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+
+/* ══════════════ APP SHELL ══════════════ */
+#app{position:fixed;inset:0;z-index:180;display:flex;flex-direction:column}
+.app-bar{height:58px;padding:0 20px;border-bottom:1px solid var(--b);background:rgba(6,8,15,.9);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.wordmark{font-size:18px;font-weight:900;letter-spacing:3px;background:linear-gradient(120deg,var(--cyan),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.bar-actions{display:flex;gap:8px;align-items:center}
+.chip{padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.5px}
+.chip-cyan{background:var(--cg);color:var(--cyan);border:1px solid rgba(0,212,255,.2)}
+.chip-violet{background:var(--vg);color:#a78bfa;border:1px solid rgba(124,58,237,.25)}
+.chip-green{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.25)}
+
+/* ══════════════ LAYOUT ══════════════ */
+.app-body{flex:1;display:grid;grid-template-columns:370px 1fr;overflow:hidden}
+
+/* ══════════════ CONTROLS PANEL ══════════════ */
+.ctrl-panel{border-left:1px solid var(--b);background:var(--s1);display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--b2) transparent}
+.ctrl-panel::-webkit-scrollbar{width:3px}
+.ctrl-panel::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+.section{padding:18px 20px;border-bottom:1px solid var(--b)}
+.sec-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:13px}
+
+/* Prompt */
+.prompt-box{width:100%;min-height:96px;resize:none;background:var(--bg);border:1px solid var(--b2);border-radius:13px;color:var(--text);font-size:14px;line-height:1.65;padding:13px 15px;outline:none;font-family:'Tajawal',sans-serif;transition:border-color .2s}
+.prompt-box:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,212,255,.07)}
+.prompt-acts{display:flex;gap:8px;margin-top:10px}
+
+/* Mode Selector */
+.mode-row{display:flex;gap:7px}
+.mode-btn{flex:1;padding:10px 6px;background:var(--bg);border:1px solid var(--b2);border-radius:11px;color:var(--soft);font-size:12px;font-weight:700;cursor:pointer;text-align:center;transition:all .18s;font-family:'Tajawal',sans-serif;line-height:1.3}
+.mode-btn.on{background:var(--cg);border-color:var(--cyan);color:var(--cyan)}
+.mode-btn:hover:not(.on){border-color:var(--b3);color:var(--text)}
+.mode-ic{font-size:18px;display:block;margin-bottom:3px}
+
+/* Presets */
+.presets{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.preset{background:var(--bg);border:1px solid var(--b2);border-radius:11px;padding:10px 6px 9px;cursor:pointer;text-align:center;transition:all .18s;color:var(--soft)}
+.preset:hover{border-color:var(--cyan);color:var(--cyan);background:var(--cg2)}
+.preset.on{border-color:var(--cyan);background:var(--cg);color:var(--cyan)}
+.preset-vis{display:flex;align-items:center;justify-content:center;height:26px;margin-bottom:5px}
+.ar-box{background:currentColor;border-radius:2px;opacity:.75}
+.preset-name{font-size:10px;font-weight:700;letter-spacing:.3px}
+.preset-ratio{font-size:9px;opacity:.6;margin-top:1px}
+.custom-dims{display:grid;grid-template-columns:1fr 20px 1fr;gap:8px;align-items:center;margin-top:11px}
+.dim-in{background:var(--bg);border:1px solid var(--b2);border-radius:9px;color:var(--text);font-size:14px;padding:9px 10px;outline:none;text-align:center;width:100%;font-family:'Space Grotesk',monospace;transition:border-color .2s}
+.dim-in:focus{border-color:var(--violet)}
+.dim-x{color:var(--muted);font-size:16px;text-align:center;font-weight:300}
+
+/* Duration */
+.dur-row{display:flex;align-items:center;gap:14px}
+.dur-slider{flex:1;-webkit-appearance:none;height:5px;background:var(--b2);border-radius:3px;outline:none;cursor:pointer}
+.dur-slider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:linear-gradient(135deg,var(--cyan),var(--violet));border-radius:50%;cursor:pointer;box-shadow:0 0 10px rgba(0,212,255,.35)}
+.dur-val{font-size:20px;font-weight:700;color:var(--cyan);font-family:'Space Grotesk',monospace;min-width:50px;text-align:center}
+
+/* FPS */
+.fps-row{display:flex;gap:7px}
+.fps-btn{flex:1;padding:9px 6px;background:var(--bg);border:1px solid var(--b2);border-radius:9px;color:var(--soft);font-size:12px;font-weight:700;cursor:pointer;text-align:center;transition:all .18s;font-family:'Tajawal',sans-serif;line-height:1.3}
+.fps-btn.on{background:var(--vg);border-color:#7c3aed;color:#c4b5fd}
+.fps-btn:hover:not(.on){border-color:var(--b3);color:var(--text)}
+
+/* Generate */
+.gen-btn{width:100%;padding:17px;background:linear-gradient(135deg,#006688,#4c1d95);border:none;border-radius:15px;color:#fff;font-size:16px;font-weight:800;cursor:pointer;transition:all .3s;font-family:'Tajawal',sans-serif;position:relative;overflow:hidden;letter-spacing:.5px}
+.gen-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--cyan),var(--violet));opacity:0;transition:opacity .35s}
+.gen-btn:hover::after{opacity:1}
+.gen-btn .gen-text{position:relative;z-index:1}
+.gen-btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* ══════════════ PREVIEW PANEL ══════════════ */
+.preview-panel{background:#030407;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.prev-head{padding:11px 18px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.prev-title{font-size:12px;color:var(--muted);letter-spacing:.5px}
+.canvas-zone{flex:1;display:flex;align-items:center;justify-content:center;padding:18px;position:relative;overflow:hidden}
+.canvas-grid{position:absolute;inset:0;background-image:linear-gradient(var(--b) 1px,transparent 1px),linear-gradient(90deg,var(--b) 1px,transparent 1px);background-size:24px 24px;opacity:.4}
+#stage{position:relative;z-index:1;border-radius:6px;box-shadow:0 0 0 1px var(--b2),0 24px 80px rgba(0,0,0,.9);image-rendering:auto}
+#video-stage{position:relative;z-index:1;border-radius:6px;box-shadow:0 0 0 1px var(--b2),0 24px 80px rgba(0,0,0,.9);max-width:100%;max-height:100%;display:none}
+.prev-foot{padding:11px 18px;border-top:1px solid var(--b);display:flex;align-items:center;gap:12px;flex-shrink:0}
+.status{font-size:12px;color:var(--muted);flex-shrink:0;min-width:0}
+.status.go{color:var(--cyan)}
+.status.ok{color:var(--green)}
+.status.err{color:var(--red)}
+.prog-track{flex:1;height:4px;background:var(--b2);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--violet),var(--cyan));border-radius:2px;width:0%;transition:width .25s ease}
+#dl-btn{display:none;white-space:nowrap}
+
+/* ══════════════ TOAST ══════════════ */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--s2);border:1px solid var(--b3);border-radius:13px;padding:12px 22px;font-size:13px;z-index:999;display:flex;align-items:center;gap:9px;box-shadow:0 12px 40px rgba(0,0,0,.5);opacity:0;transition:all .28s ease;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ══════════════ UTILS ══════════════ */
+.hidden{display:none!important}
+.mt-2{margin-top:8px}
+</style>
+</head>
+<body>
+
+<!-- ══════════ LOCK SCREEN ══════════ -->
+<div id="lock">
+  <div class="lock-orb1"></div>
+  <div class="lock-orb2"></div>
+  <div class="lock-card">
+    <span class="lock-glyph">🎬</span>
+    <div class="lock-wordmark">GENESIS</div>
+    <div class="lock-tagline">AI Video Studio Pro · Private</div>
+    <div class="pw-wrap">
+      <input type="password" class="pw-input" id="pw" placeholder="كلمة المرور" autocomplete="off" maxlength="32" onkeydown="if(event.key==='Enter')unlock()">
+    </div>
+    <div class="pw-err" id="pw-err"></div>
+    <button class="btn btn-prime" onclick="unlock()"><span>دخول ←</span></button>
+  </div>
+</div>
+
+<!-- ══════════ API SETUP SCREEN ══════════ -->
+<div id="api-screen" class="hidden">
+  <div class="api-card">
+    <div class="api-head">🔑 إعداد المفاتيح</div>
+    <div class="api-sub">المفاتيح تُحفظ على جهازك في localStorage — تُستخدم مباشرة من المتصفح أو عبر الـ Backend.</div>
+    <div class="field">
+      <label>Anthropic API Key (لـ Claude Canvas)</label>
+      <input type="password" id="api-key" placeholder="sk-ant-api03-...">
+      <div class="hint">من <strong>console.anthropic.com</strong> ← API Keys</div>
+    </div>
+    <div class="field">
+      <label>كلمة المرور (اختياري)</label>
+      <input type="password" id="new-pw" placeholder="اتركه فارغاً للإبقاء على الحالية">
+    </div>
+    <button class="btn btn-prime mt-2" onclick="saveSetup()"><span>حفظ والمتابعة ←</span></button>
+  </div>
+</div>
+
+<!-- ══════════ MAIN APP ══════════ -->
+<div id="app" class="hidden">
+
+  <!-- App Bar -->
+  <header class="app-bar">
+    <span class="wordmark">GENESIS</span>
+    <div class="bar-actions">
+      <span class="chip chip-cyan" id="size-chip">1920×1080</span>
+      <span class="chip chip-violet" id="fps-chip">30 fps</span>
+      <span class="chip chip-green" id="mode-label">Canvas</span>
+      <button class="btn-icon" onclick="openSettings()" title="إعدادات">⚙️</button>
+      <button class="btn-icon" onclick="lockApp()" title="قفل">🔒</button>
+    </div>
+  </header>
+
+  <div class="app-body">
+
+    <!-- ══ PREVIEW PANEL ══ -->
+    <div class="preview-panel">
+      <div class="prev-head">
+        <span class="prev-title">المعاينة</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn-icon" onclick="replayPreview()" id="replay-btn" title="إعادة تشغيل" style="display:none">▶</button>
+        </div>
+      </div>
+      <div class="canvas-zone" id="canvas-zone">
+        <div class="canvas-grid"></div>
+        <canvas id="stage"></canvas>
+        <video id="video-stage" controls></video>
+      </div>
+      <div class="prev-foot">
+        <span class="status" id="status">جاهز ✨</span>
+        <div class="prog-track"><div class="prog-fill" id="prog"></div></div>
+        <button class="btn-ghost btn-icon" id="dl-btn" onclick="downloadVid()" title="تحميل">⬇</button>
+      </div>
+    </div>
+
+    <!-- ══ CONTROLS PANEL ══ -->
+    <div class="ctrl-panel">
+
+      <!-- Mode Selector -->
+      <div class="section">
+        <div class="sec-label">وضع التوليد</div>
+        <div class="mode-row" id="mode-row">
+          <button class="mode-btn on" data-mode="canvas" onclick="pickMode(this)">
+            <span class="mode-ic">🎨</span>
+            Canvas
+            <br><small style="font-weight:400;font-size:10px;opacity:.7">Claude + رسم</small>
+          </button>
+          <button class="mode-btn" data-mode="replicate" onclick="pickMode(this)">
+            <span class="mode-ic">🤖</span>
+            Replicate
+            <br><small style="font-weight:400;font-size:10px;opacity:.7">AI حقيقي</small>
+          </button>
+          <button class="mode-btn" data-mode="both" onclick="pickMode(this)">
+            <span class="mode-ic">⚡</span>
+            DUAL
+            <br><small style="font-weight:400;font-size:10px;opacity;.7">دمج الاثنين</small>
+          </button>
+        </div>
+      </div>
+
+      <!-- Prompt -->
+      <div class="section">
+        <div class="sec-label">البرومبت</div>
+        <textarea class="prompt-box" id="prompt" rows="4" placeholder="اكتب فكرة الفيديو... مثال: فيديو إعلاني لهاتف ذكي، أضواء نيون زرقاء على خلفية سوداء، أسلوب سينمائي احترافي"></textarea>
+        <div class="prompt-acts">
+          <button class="btn-ghost" id="enhance-btn" onclick="enhancePrompt()">✨ تحسين بـ Claude</button>
+          <button class="btn-ghost" onclick="clearPrompt()">🗑 مسح</button>
+        </div>
+      </div>
+
+      <!-- Dimensions -->
+      <div class="section">
+        <div class="sec-label">الأبعاد</div>
+        <div class="presets" id="presets">
+          <div class="preset on" data-w="1920" data-h="1080" onclick="pickPreset(this)">
+            <div class="preset-vis"><div class="ar-box" style="width:27px;height:15px"></div></div>
+            <div class="preset-name">أفقي</div>
+            <div class="preset-ratio">16:9</div>
+          </div>
+          <div class="preset" data-w="1080" data-h="1920" onclick="pickPreset(this)">
+            <div class="preset-vis"><div class="ar-box" style="width:14px;height:25px"></div></div>
+            <div class="preset-name">رأسي</div>
+            <div class="preset-ratio">9:16</div>
+          </div>
+          <div class="preset" data-w="1080" data-h="1080" onclick="pickPreset(this)">
+            <div class="preset-vis"><div class="ar-box" style="width:22px;height:22px"></div></div>
+            <div class="preset-name">مربع</div>
+            <div class="preset-ratio">1:1</div>
+          </div>
+          <div class="preset" data-w="custom" data-h="custom" onclick="pickPreset(this)">
+            <div class="preset-vis" style="font-size:20px">⚙</div>
+            <div class="preset-name">مخصص</div>
+            <div class="preset-ratio">custom</div>
+          </div>
+        </div>
+        <div class="custom-dims hidden" id="custom-dims">
+          <input type="number" class="dim-in" id="dw" value="1280" min="200" max="4096" placeholder="عرض" onchange="applyCustom()">
+          <div class="dim-x">×</div>
+          <input type="number" class="dim-in" id="dh" value="720" min="200" max="4096" placeholder="ارتفاع" onchange="applyCustom()">
+        </div>
+      </div>
+
+      <!-- Duration -->
+      <div class="section">
+        <div class="sec-label">المدة الزمنية</div>
+        <div class="dur-row">
+          <input type="range" class="dur-slider" id="dur-slider" min="5" max="60" value="15" oninput="setDur(this.value)">
+          <div class="dur-val" id="dur-val">15s</div>
+        </div>
+      </div>
+
+      <!-- FPS / Quality -->
+      <div class="section">
+        <div class="sec-label">الجودة / FPS</div>
+        <div class="fps-row" id="fps-row">
+          <button class="fps-btn" data-fps="24" onclick="pickFps(this)">24 fps<br><small style="font-weight:400;font-size:10px;opacity:.7">سريع</small></button>
+          <button class="fps-btn on" data-fps="30" onclick="pickFps(this)">30 fps<br><small style="font-weight:400;font-size:10px;opacity:.7">متوازن</small></button>
+          <button class="fps-btn" data-fps="60" onclick="pickFps(this)">60 fps<br><small style="font-weight:400;font-size:10px;opacity:.7">ناعم</small></button>
+        </div>
+      </div>
+
+      <!-- Generate -->
+      <div class="section">
+        <button class="gen-btn" id="gen-btn" onclick="generate()">
+          <span class="gen-text" id="gen-text">🎬 إنشاء الفيديو</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span id="toast-icon">✓</span>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+'use strict';
+
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+const S = {
+  apiKey: null,
+  canvasW: 1920, canvasH: 1080,
+  dur: 15, fps: 30,
+  mode: 'canvas',
+  scenes: null, videoBlob: null,
+  busy: false, raf: null,
+  pollTimer: null,
+};
+
+const DEFAULT_PW = 'youssef';
+const API = '';  // same origin backend
+
+/* ═══════════════════════════════════════════
+   AUTH
+═══════════════════════════════════════════ */
+function getStoredPw() { return localStorage.getItem('gs_pw') || DEFAULT_PW; }
+
+function unlock() {
+  const v = document.getElementById('pw').value.trim();
+  if (v === getStoredPw()) {
+    hide('lock');
+    const k = localStorage.getItem('gs_key');
+    if (k) { S.apiKey = k; openApp(); }
+    else show('api-screen');
+  } else {
+    const e = document.getElementById('pw-err');
+    e.textContent = '❌ كلمة مرور خاطئة';
+    document.getElementById('pw').value = '';
+    setTimeout(() => e.textContent = '', 2500);
+  }
+}
+
+function saveSetup() {
+  const k = document.getElementById('api-key').value.trim();
+  if (k && !k.startsWith('sk-ant-')) { toast('❌', 'المفتاح يجب أن يبدأ بـ sk-ant-'); return; }
+  if (k) { S.apiKey = k; localStorage.setItem('gs_key', k); }
+  const np = document.getElementById('new-pw').value.trim();
+  if (np.length >= 4) { localStorage.setItem('gs_pw', np); toast('✅', 'تم حفظ المفتاح وتحديث كلمة المرور'); }
+  else toast('✅', 'تم الحفظ');
+  hide('api-screen');
+  openApp();
+}
+
+function openSettings() {
+  document.getElementById('api-key').value = S.apiKey || '';
+  document.getElementById('new-pw').value = '';
+  show('api-screen');
+}
+
+function lockApp() {
+  if (S.raf) cancelAnimationFrame(S.raf);
+  if (S.pollTimer) clearInterval(S.pollTimer);
+  hide('app'); show('lock');
+  document.getElementById('pw').value = '';
+}
+
+/* ═══════════════════════════════════════════
+   CANVAS SETUP
+═══════════════════════════════════════════ */
+function openApp() {
+  show('app');
+  initCanvas();
+}
+
+function initCanvas() {
+  const c = document.getElementById('stage');
+  c.width = S.canvasW;
+  c.height = S.canvasH;
+  fitCanvas();
+  drawIdle();
+  document.getElementById('size-chip').textContent = S.canvasW + '×' + S.canvasH;
+}
+
+function fitCanvas() {
+  const c = document.getElementById('stage');
+  const z = document.getElementById('canvas-zone');
+  const pad = 36;
+  const zw = z.clientWidth - pad;
+  const zh = z.clientHeight - pad;
+  const scale = Math.min(zw / c.width, zh / c.height, 1);
+  c.style.width = c.width + 'px';
+  c.style.height = c.height + 'px';
+  c.style.transform = `scale(${scale})`;
+  c.style.transformOrigin = 'center center';
+}
+
+function drawIdle() {
+  const c = document.getElementById('stage');
+  const ctx = c.getContext('2d');
+  const w = c.width, h = c.height;
+  ctx.clearRect(0, 0, w, h);
+  const g = ctx.createLinearGradient(0, 0, w, h);
+  g.addColorStop(0, '#06080f'); g.addColorStop(1, '#0b1220');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+  const rg = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.min(w, h) * .42);
+  rg.addColorStop(0, 'rgba(124,58,237,.18)'); rg.addColorStop(1, 'transparent');
+  ctx.fillStyle = rg; ctx.fillRect(0, 0, w, h);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.font = `500 ${h * .04}px Tajawal`;
+  ctx.fillStyle = 'rgba(255,255,255,.13)';
+  ctx.fillText('أدخل البرومبت واضغط إنشاء', w/2, h/2);
+  ctx.font = `300 ${h * .022}px Space Grotesk`;
+  ctx.fillStyle = 'rgba(255,255,255,.06)';
+  ctx.fillText('GENESIS AI VIDEO STUDIO PRO', w/2, h/2 + h * .068);
+}
+
+/* ═══════════════════════════════════════════
+   UI CONTROLS
+═══════════════════════════════════════════ */
+function pickMode(el) {
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  S.mode = el.dataset.mode;
+  const labels = {canvas:'Canvas', replicate:'Replicate', both:'DUAL ⚡'};
+  document.getElementById('mode-label').textContent = labels[S.mode] || 'Canvas';
+}
+
+function pickPreset(el) {
+  document.querySelectorAll('.preset').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  const w = el.dataset.w, h = el.dataset.h;
+  const cd = document.getElementById('custom-dims');
+  if (w === 'custom') { cd.classList.remove('hidden'); }
+  else { cd.classList.add('hidden'); S.canvasW = +w; S.canvasH = +h; initCanvas(); }
+}
+
+function applyCustom() {
+  const w = +document.getElementById('dw').value;
+  const h = +document.getElementById('dh').value;
+  if (w >= 200 && h >= 200) { S.canvasW = w; S.canvasH = h; initCanvas(); }
+}
+
+function setDur(v) {
+  S.dur = +v;
+  document.getElementById('dur-val').textContent = v + 's';
+}
+
+function pickFps(el) {
+  document.querySelectorAll('.fps-btn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  S.fps = +el.dataset.fps;
+  document.getElementById('fps-chip').textContent = S.fps + ' fps';
+}
+
+function clearPrompt() { document.getElementById('prompt').value = ''; }
+
+/* ═══════════════════════════════════════════
+   CLAUDE API
+═══════════════════════════════════════════ */
+async function callClaude(messages, sys, maxTok = 2000) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': S.apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: maxTok, system: sys, messages })
+  });
+  if (!res.ok) { const e = await res.json(); throw new Error(e.error?.message || 'API Error'); }
+  const d = await res.json();
+  return d.content.map(b => b.text || '').join('');
+}
+
+/* ═══════════════════════════════════════════
+   PROMPT ENHANCE
+═══════════════════════════════════════════ */
+async function enhancePrompt() {
+  const p = document.getElementById('prompt').value.trim();
+  if (!p) { toast('⚠️', 'اكتب فكرة أولاً'); return; }
+  const btn = document.getElementById('enhance-btn');
+  btn.disabled = true; btn.textContent = '⏳ جاري...';
+  try {
+    const sys = `أنت مدير إبداعي لمقاطع فيديو سينمائية. تُحسّن الأفكار وتُضيف عليها تفاصيل بصرية غنية. اكتب الوصف المحسّن فقط بدون أي مقدمة.`;
+    const txt = await callClaude([{role:'user',content:`حسّن فكرة الفيديو التالية وأضف تفاصيل سينمائية: ألوان، إضاءة، حركة، أجواء (2-3 جمل):\n${p}`}], sys, 400);
+    document.getElementById('prompt').value = txt.trim();
+    toast('✨', 'تم تحسين الفكرة');
+  } catch(e) { toast('❌', e.message); }
+  finally { btn.disabled = false; btn.textContent = '✨ تحسين بـ Claude'; }
+}
+
+/* ═══════════════════════════════════════════
+   SCENE GENERATION PROMPT
+═══════════════════════════════════════════ */
+const SCENE_SYS = `أنت محرك توليد فيديو على Canvas. تُنتج JSON بالضبط — بدون markdown وبدون أي نص إضافي.
+
+الهيكل الكامل:
+{
+  "title": "string",
+  "scenes": [
+    {
+      "duration": 4.5,
+      "bg": { "colors": ["#0a0012","#120030"], "angle": 135 },
+      "elements": [
+        { "type": "glow", "x": 0.5, "y": 0.38, "r": 0.32, "color": "#7c3aed", "op": 0.22 },
+        { "type": "particles", "count": 45, "color": "#00d4ff", "sz": 2.5, "dir": "up" },
+        { "type": "headline", "text": "النص الرئيسي", "y": 0.38, "sz": 0.068, "color": "#ffffff", "anim": "slideUp", "delay": 0.0 },
+        { "type": "sub", "text": "نص توضيحي ثانوي", "y": 0.52, "sz": 0.028, "color": "#94a3b8", "anim": "fadeIn", "delay": 0.3 },
+        { "type": "line", "y": 0.61, "w": 0.44, "color": "#00d4ff", "anim": "grow", "delay": 0.5 }
+      ]
+    }
+  ]
+}
+
+قواعد صارمة:
+- x,y من 0 إلى 1 (نسبة من أبعاد الكانفاس)
+- sz نسبة من الارتفاع (0.03=صغير, 0.09=كبير)
+- مجموع durations يجب أن يساوي تماماً المدة المطلوبة
+- عدد المشاهد: من 3 إلى 6
+- كل مشهد مختلف بصرياً عن الآخر في الألوان والعناصر
+- anim: slideUp | slideDown | fadeIn | zoom
+- dir: up | scatter | fountain
+- اختر ألواناً سينمائية احترافية تناسب الفكرة
+- لا تكرر نفس النصوص بين المشاهد
+- الـ particles و glow يأتيان دائماً أول عناصر كل مشهد`;
+
+async function fetchScenes(prompt, dur) {
+  const msg = `الفكرة: ${prompt}\nالمدة الإجمالية: ${dur} ثانية بالضبط (مجموع durations = ${dur})\nأبعاد الكانفاس: ${S.canvasW}×${S.canvasH}\nأنشئ مشاهد JSON.`;
+  let raw = await callClaude([{role:'user',content:msg}], SCENE_SYS, 3000);
+  raw = raw.replace(/```json/g,'').replace(/```/g,'').trim();
+  const data = JSON.parse(raw);
+  const total = data.scenes.reduce((s,sc) => s + sc.duration, 0);
+  const f = dur / total;
+  data.scenes.forEach(sc => sc.duration = sc.duration * f);
+  return data.scenes;
+}
+
+/* ═══════════════════════════════════════════
+   RENDERER UTILITIES
+═══════════════════════════════════════════ */
+function hex2rgba(hex, a) {
+  let c = hex.replace('#','');
+  if (c.length===3) c = c.split('').map(x=>x+x).join('');
+  return `rgba(${parseInt(c.slice(0,2),16)},${parseInt(c.slice(2,4),16)},${parseInt(c.slice(4,6),16)},${a})`;
+}
+
+function easeOut(t) { return 1 - Math.pow(1-t, 3); }
+function easeInOut(t) { return t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
+
+function H(n) { const s = Math.sin(n*127.1+311.7)*43758.5453; return s-Math.floor(s); }
+
+function animProg(sp, delay, dur) {
+  const s = delay || 0, d = dur || 0.38, e = s + d;
+  if (sp < s) return 0;
+  if (sp > e) return 1;
+  return easeOut((sp - s) / d);
+}
+
+function fillRRect(ctx, x, y, w, h, r) {
+  r = Math.min(r, w/2, h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
+}
+
+/* ═══════════════════════════════════════════
+   ELEMENT RENDERERS
+═══════════════════════════════════════════ */
+function renderBg(ctx, bg, w, h) {
+  const angle = ((bg.angle || 135) * Math.PI) / 180;
+  const cx = w/2, cy = h/2;
+  const len = Math.sqrt(w*w+h*h);
+  const g = ctx.createLinearGradient(
+    cx - Math.cos(angle)*len/2, cy - Math.sin(angle)*len/2,
+    cx + Math.cos(angle)*len/2, cy + Math.sin(angle)*len/2
+  );
+  (bg.colors||['#06080f','#0b1220']).forEach((c,i,a) => g.addColorStop(i/Math.max(a.length-1,1),c));
+  ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+}
+
+function renderGlow(ctx, el, sp, w, h) {
+  const x=(el.x||.5)*w, y=(el.y||.5)*h, r=(el.r||.3)*Math.min(w,h);
+  const op = (el.op||.25)*Math.min(1, sp*4);
+  const g = ctx.createRadialGradient(x,y,0,x,y,r);
+  g.addColorStop(0, hex2rgba(el.color||'#7c3aed', op));
+  g.addColorStop(.6, hex2rgba(el.color||'#7c3aed', op*.4));
+  g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+}
+
+function renderParticles(ctx, el, sp, w, h) {
+  const count=el.count||35, color=el.color||'#fff', sz=el.sz||2, dir=el.dir||'scatter';
+  ctx.save();
+  for (let i=0; i<count; i++) {
+    const sx=H(i*1.3), sy=H(i*7.9), ss=H(i*13.7), so=H(i*3.1);
+    const spd = .4+ss*.6;
+    const t = (sp*spd + sy) % 1;
+    let px, py, alpha;
+    if (dir==='up') {
+      px = sx*w + Math.sin(i*2.1+sp*2.5)*w*.03;
+      py = (1-t)*h*1.08 - h*.04;
+      alpha = t<.1?t*10:t>.8?(1-t)*5:(.5+so*.5);
+    } else if (dir==='fountain') {
+      const ang = Math.PI+Math.PI*.4+sx*Math.PI*.22;
+      const dist = t*Math.min(w,h)*.42*spd;
+      px = w/2 + Math.cos(ang)*dist + Math.sin(t*8+i)*6;
+      py = h*.75 + Math.sin(ang)*dist - t*t*h*.28;
+      alpha = (1-t)*.95;
+    } else {
+      const ang2 = sx*Math.PI*2;
+      const drift = sp*spd*.12;
+      px = ((sx + Math.cos(ang2)*drift)*w + w) % w;
+      py = ((sy + Math.sin(ang2)*drift)*h + h) % h;
+      alpha = .3 + Math.sin(sp*4+i)*.25 + .2;
+    }
+    const ps = sz*(.6+ss*.4);
+    ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.arc(px, py, ps, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha=1; ctx.restore();
+}
+
+function renderText(ctx, el, sp, w, h, isHeadline) {
+  const p = animProg(sp, el.delay||0, .38);
+  if (p <= 0) return;
+  const fs = (el.sz||.05)*h;
+  const x = (el.x||.5)*w, baseY = (el.y||.5)*h;
+  ctx.save();
+  ctx.textAlign = el.align||'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = el.color||'#fff';
+  ctx.font = `${isHeadline?'bold':'500'} ${fs}px Tajawal, sans-serif`;
+  let y = baseY, alpha = p;
+  if (el.anim==='slideUp') y = baseY + (1-easeOut(p))*fs*.85;
+  else if (el.anim==='slideDown') y = baseY - (1-easeOut(p))*fs*.85;
+  else if (el.anim==='zoom') {
+    const sc = .2+easeOut(p)*.8;
+    ctx.translate(x, baseY); ctx.scale(sc,sc); ctx.translate(-x,-baseY); y=baseY;
+  }
+  ctx.globalAlpha = alpha;
+  ctx.fillText(el.text||'', x, y);
+  ctx.restore();
+}
+
+function renderLine(ctx, el, sp, w, h) {
+  const p = animProg(sp, el.delay||0, .45);
+  if (p <= 0) return;
+  const lw = (el.w||.5)*w*easeInOut(p);
+  const lh = Math.max(2, (el.h||.003)*h);
+  const x = (el.x||.5)*w, y = (el.y||.5)*h;
+  ctx.save();
+  ctx.globalAlpha = p;
+  ctx.fillStyle = el.color||'#00d4ff';
+  ctx.shadowColor = el.color||'#00d4ff'; ctx.shadowBlur = lh*4;
+  fillRRect(ctx, x-lw/2, y-lh/2, lw, lh, lh);
+  ctx.fill();
+  ctx.shadowBlur = 0; ctx.restore();
+}
+
+function renderEl(ctx, el, sp, w, h) {
+  try {
+    switch(el.type) {
+      case 'headline': renderText(ctx, el, sp, w, h, true); break;
+      case 'sub':      renderText(ctx, el, sp, w, h, false); break;
+      case 'line':     renderLine(ctx, el, sp, w, h); break;
+      case 'glow':     renderGlow(ctx, el, sp, w, h); break;
+      case 'particles':renderParticles(ctx, el, sp, w, h); break;
+    }
+  } catch(e) {}
+}
+
+/* ═══════════════════════════════════════════
+   FRAME RENDER
+═══════════════════════════════════════════ */
+function renderFrame(ctx, scenes, t, w, h) {
+  let elapsed = 0;
+  for (let i = 0; i < scenes.length; i++) {
+    const sc = scenes[i];
+    if (t <= elapsed + sc.duration || i === scenes.length - 1) {
+      const st = Math.max(0, t - elapsed);
+      const sp = Math.min(1, st / sc.duration);
+      renderBg(ctx, sc.bg||{colors:['#06080f','#0b1220']}, w, h);
+      const fadeDur = Math.min(.6, sc.duration * .15);
+      const bgEls = (sc.elements||[]).filter(e=>e.type==='glow'||e.type==='particles');
+      const fgEls = (sc.elements||[]).filter(e=>e.type!=='glow'&&e.type!=='particles');
+      for (const el of bgEls) renderEl(ctx, el, sp, w, h);
+      for (const el of fgEls) renderEl(ctx, el, sp, w, h);
+      if (i > 0 && st < fadeDur) {
+        const fadeAlpha = 1 - st/fadeDur;
+        ctx.fillStyle = `rgba(0,0,0,${fadeAlpha * .85})`;
+        ctx.fillRect(0, 0, w, h);
+      }
+      if (st > sc.duration - fadeDur) {
+        const fadeAlpha = (st - (sc.duration - fadeDur)) / fadeDur;
+        ctx.fillStyle = `rgba(0,0,0,${Math.min(1, fadeAlpha) * .85})`;
+        ctx.fillRect(0, 0, w, h);
+      }
+      return;
+    }
+    elapsed += sc.duration;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   VIDEO RECORDING (Canvas mode)
+═══════════════════════════════════════════ */
+function recordVideo(canvas, scenes, dur, fps) {
+  return new Promise((resolve, reject) => {
+    const types = ['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];
+    const mime = types.find(t => MediaRecorder.isTypeSupported(t)) || 'video/webm';
+    const stream = canvas.captureStream(fps);
+    const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 8_000_000 });
+    const chunks = [];
+    rec.ondataavailable = e => { if (e.data.size>0) chunks.push(e.data); };
+    rec.onstop = () => resolve(new Blob(chunks, {type: mime}));
+    rec.onerror = reject;
+    rec.start(100);
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    const totalF = Math.ceil(dur * fps);
+    const frameDurMs = 1000/fps;
+    let frame = 0, lastTs = null;
+    function tick(ts) {
+      if (lastTs === null) lastTs = ts;
+      if (ts - lastTs >= frameDurMs - 1) {
+        const ct = Math.min((frame/fps), dur);
+        renderFrame(ctx, scenes, ct, w, h);
+        setProgress(50 + (frame/totalF)*50);
+        setStatus(`🎞 تسجيل الفيديو... ${Math.round((frame/totalF)*100)}%`, 'go');
+        frame++; lastTs = ts;
+      }
+      if (frame < totalF) {
+        S.raf = requestAnimationFrame(tick);
+      } else {
+        renderFrame(ctx, scenes, dur, w, h);
+        setTimeout(() => rec.stop(), 400);
+      }
+    }
+    S.raf = requestAnimationFrame(tick);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   PREVIEW LOOP
+═══════════════════════════════════════════ */
+function startPreviewLoop(scenes) {
+  if (S.raf) cancelAnimationFrame(S.raf);
+  const c = document.getElementById('stage');
+  const ctx = c.getContext('2d');
+  const w = c.width, h = c.height;
+  let startTime = null;
+  function loop(ts) {
+    if (!startTime) startTime = ts;
+    const elapsed = (ts - startTime) / 1000;
+    const t = elapsed % S.dur;
+    renderFrame(ctx, scenes, t, w, h);
+    S.raf = requestAnimationFrame(loop);
+  }
+  S.raf = requestAnimationFrame(loop);
+}
+
+function replayPreview() {
+  if (S.scenes) startPreviewLoop(S.scenes);
+}
+
+/* ═══════════════════════════════════════════
+   REPLICATE BACKEND CALLS
+═══════════════════════════════════════════ */
+async function startReplicateJob(prompt, w, h, secs, fps, mode) {
+  const url = mode === 'both' ? '/api/generate-dual' : '/api/generate';
+  const body = {
+    prompt, width: w, height: h, seconds: secs, fps, mode,
+    api_key: S.apiKey,
+  };
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(body),
+  });
+  if (!r.ok) throw new Error(`Backend error: ${r.status}`);
+  return (await r.json()).job_id;
+}
+
+function pollJob(jobId) {
+  if (S.pollTimer) clearInterval(S.pollTimer);
+  S.pollTimer = setInterval(async () => {
+    try {
+      const r = await fetch(`/api/status/${jobId}`);
+      const d = await r.json();
+      if (d.status === 'processing') {
+        setStatus(`⏳ Replicate يعمل... ${d.progress || ''}`, 'go');
+        setProgress(50);
+      } else if (d.status === 'succeeded') {
+        clearInterval(S.pollTimer);
+        setProgress(100);
+        setStatus('✅ الفيديو جاهز!', 'ok');
+        showVideoResult(d.video_url, d.enhanced_prompt);
+      } else if (d.status === 'failed') {
+        clearInterval(S.pollTimer);
+        setStatus('❌ ' + (d.error || 'فشل التوليد'), 'err');
+        toast('❌', d.error || 'فشل التوليد');
+        S.busy = false;
+        document.getElementById('gen-btn').disabled = false;
+      }
+    } catch(e) {
+      clearInterval(S.pollTimer);
+      setStatus('❌ خطأ في الاتصال', 'err');
+      S.busy = false;
+      document.getElementById('gen-btn').disabled = false;
+    }
+  }, 2000);
+}
+
+function showVideoResult(videoUrl, enhancedPrompt) {
+  const canvas = document.getElementById('stage');
+  const video = document.getElementById('video-stage');
+  canvas.style.display = 'none';
+  video.style.display = 'block';
+  video.src = videoUrl;
+  video.load();
+  video.play();
+  document.getElementById('dl-btn').style.display = 'flex';
+  document.getElementById('replay-btn').style.display = 'flex';
+  S.videoBlob = { url: videoUrl };
+  if (enhancedPrompt) toast('⚡', 'تم التحسين بـ Claude + Replicate');
+  else toast('🎬', 'تم التوليد عبر Replicate!');
+  S.busy = false;
+  document.getElementById('gen-btn').disabled = false;
+}
+
+/* ═══════════════════════════════════════════
+   MAIN GENERATE
+═══════════════════════════════════════════ */
+async function generate() {
+  const prompt = document.getElementById('prompt').value.trim();
+  if (!prompt) { toast('⚠️', 'اكتب فكرة الفيديو أولاً'); return; }
+  if (S.busy) return;
+  S.busy = true;
+
+  if (S.raf) { cancelAnimationFrame(S.raf); S.raf = null; }
+  if (S.pollTimer) { clearInterval(S.pollTimer); S.pollTimer = null; }
+
+  const gen = document.getElementById('gen-btn');
+  const dl = document.getElementById('dl-btn');
+  const replay = document.getElementById('replay-btn');
+  gen.disabled = true; dl.style.display = 'none'; replay.style.display = 'none';
+  setProgress(0);
+
+  const activeP = document.querySelector('.preset.on');
+  if (activeP?.dataset.w === 'custom') applyCustom();
+
+  // Show canvas, hide video
+  document.getElementById('stage').style.display = 'block';
+  document.getElementById('video-stage').style.display = 'none';
+
+  const c = document.getElementById('stage');
+  c.width = S.canvasW; c.height = S.canvasH;
+  fitCanvas();
+  const ctx = c.getContext('2d');
+
+  try {
+    // ═══════════════ CANVAS MODE ═══════════════
+    if (S.mode === 'canvas') {
+      await document.fonts.load(`bold ${S.canvasH*.06}px Tajawal`);
+      await document.fonts.load(`500 ${S.canvasH*.03}px Tajawal`);
+      setStatus('🤖 Claude يحلل الفكرة...', 'go');
+      setProgress(8);
+      const scenes = await fetchScenes(prompt, S.dur);
+      S.scenes = scenes;
+      setStatus('🎨 جاري بناء المشاهد...', 'go');
+      setProgress(50);
+      renderFrame(ctx, scenes, 0, c.width, c.height);
+      const blob = await recordVideo(c, scenes, S.dur, S.fps);
+      S.videoBlob = blob;
+      setProgress(100);
+      setStatus('✅ الفيديو جاهز للتحميل', 'ok');
+      dl.style.display = 'flex'; replay.style.display = 'flex';
+      toast('🎬', 'تم إنشاء الفيديو بنجاح!');
+      startPreviewLoop(scenes);
+    }
+    // ═══════════════ REPLICATE MODE ═══════════════
+    else if (S.mode === 'replicate') {
+      setStatus('🚀 إرسال لـ Replicate...', 'go');
+      setProgress(20);
+      const jobId = await startReplicateJob(prompt, S.canvasW, S.canvasH, S.dur, S.fps, 'replicate');
+      pollJob(jobId);
+    }
+    // ═══════════════ DUAL MODE (Claude + Replicate) ═══════════════
+    else if (S.mode === 'both') {
+      setStatus('⚡ Claude يحسن البرومبت أولاً...', 'go');
+      setProgress(10);
+      // Enhance prompt with Claude
+      const enhanceSys = `أنت خبير في كتابة برومبتات توليد الفيديو. حوّل الفكرة البسغط إلى وصف سينمائي غني ومفصل يصلح لنماذج توليد الفيديو. اكتب الوصف المحسّن فقط بدون أي مقدمة.`;
+      const enhanced = await callClaude([{role:'user',content:`حسّن و detail الفكرة التالية لبرومبت فيديو AI:\n${prompt}`}], enhanceSys, 500);
+      setStatus('🚀 إرسال النسخة المحسّنة لـ Replicate...', 'go');
+      setProgress(25);
+      const finalPrompt = enhanced.trim() || prompt;
+      const jobId = await startReplicateJob(finalPrompt, S.canvasW, S.canvasH, S.dur, S.fps, 'both');
+      pollJob(jobId);
+    }
+  } catch(e) {
+    setStatus('❌ ' + e.message, 'err');
+    toast('❌', e.message);
+    setProgress(0);
+    drawIdle();
+    S.busy = false;
+    gen.disabled = false;
+  }
+}
+
+function downloadVid() {
+  if (!S.videoBlob) return;
+  if (S.videoBlob.url) {
+    // Replicate video - open in new tab
+    window.open(S.videoBlob.url, '_blank');
+    toast('⬇️', 'جاري فتح الفيديو...');
+  } else {
+    // Canvas recorded video
+    const url = URL.createObjectURL(S.videoBlob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `genesis-${Date.now()}.webm`; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
+    toast('⬇️', 'جاري التحميل...');
+  }
+}
+
+/* ═══════════════════════════════════════════
+   UI HELPERS
+═══════════════════════════════════════════ */
+function show(id) { document.getElementById(id).classList.remove('hidden'); }
+function hide(id) { document.getElementById(id).classList.add('hidden'); }
+
+function setStatus(txt, cls) {
+  const el = document.getElementById('status');
+  el.textContent = txt;
+  el.className = 'status' + (cls ? ' '+cls : '');
+}
+
+function setProgress(pct) {
+  document.getElementById('prog').style.width = pct + '%';
+}
+
+let toastTimer = null;
+function toast(icon, msg) {
+  document.getElementById('toast-icon').textContent = icon;
+  document.getElementById('toast-msg').textContent = msg;
+  const el = document.getElementById('toast');
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+/* ═══════════════════════════════════════════
+   EVENTS
+═══════════════════════════════════════════ */
+window.addEventListener('resize', fitCanvas);
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if (!document.getElementById('lock').classList.contains('hidden')) unlock();
+  else if (!document.getElementById('api-screen').classList.contains('hidden')) saveSetup();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  hide('lock');
+  const k = localStorage.getItem('gs_key');
+  if (k) { S.apiKey = k; openApp(); }
+  else show('api-screen');
+  console.log('%c🎬 GENESIS AI Video Studio Pro', 'color:#00d4ff;font-size:18px;font-weight:900');
+  console.log('%cPowered by Claude + Replicate', 'color:#7c3aed;font-size:12px');
+});
+</script>
+</body>
+</html>
