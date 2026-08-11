@@ -48,4 +48,4 @@ python genesis_merged.py
 
 - مفتاح Anthropic يُحفظ في localStorage على جهازك فقط
 - مفتاح Replicate يُفضل كـ env variable على السيرفر
-- كلمة المرور الافتراضية: `youssef`
+- كلمة المرور الافتراضية: `G3n3$1s_Pr0!2026xQ`
