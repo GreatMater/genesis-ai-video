@@ -36,17 +36,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);hei
 .pw-input:focus{border-color:var(--cyan);box-shadow:0 0 0 4px rgba(0,212,255,.1)}
 .pw-err{height:22px;font-size:13px;color:var(--red);text-align:center;margin-bottom:12px}
 
-/* ══════════════ API SCREEN ══════════════ */
-#api-screen{position:fixed;inset:0;z-index:190;display:flex;align-items:center;justify-content:center;background:rgba(6,8,15,.9);backdrop-filter:blur(8px)}
-.api-card{background:var(--s1);border:1px solid var(--b3);border-radius:24px;padding:40px;width:500px;max-width:95vw;box-shadow:0 24px 64px rgba(0,0,0,.5)}
-.api-head{font-size:22px;font-weight:800;margin-bottom:6px}
-.api-sub{font-size:13px;color:var(--soft);margin-bottom:28px;line-height:1.6}
-.field{margin-bottom:18px}
-.field label{display:block;font-size:12px;font-weight:600;color:var(--soft);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
-.field input{width:100%;padding:13px 16px;background:var(--bg);border:1px solid var(--b2);border-radius:12px;color:var(--text);font-size:14px;outline:none;transition:border-color .2s;font-family:'Space Grotesk',monospace}
-.field input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,212,255,.08)}
-.field .hint{font-size:12px;color:var(--muted);margin-top:6px}
-
 /* ══════════════ BUTTONS ══════════════ */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:13px 24px;border-radius:13px;font-size:15px;font-weight:700;font-family:'Tajawal',sans-serif;cursor:pointer;border:none;transition:all .2s;width:100%}
 .btn-prime{background:linear-gradient(135deg,#0088aa,#5b21b6);color:#fff;position:relative;overflow:hidden}
@@ -170,26 +159,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);hei
   </div>
 </div>
 
-<!-- ══════════ API SETUP SCREEN ══════════ -->
-<div id="api-screen" class="hidden">
-  <div class="api-card">
-    <div class="api-head">🔑 إعداد المفاتيح</div>
-    <div class="api-sub">المفاتيح تُحفظ على جهازك في localStorage — تُستخدم مباشرة من المتصفح أو عبر الـ Backend.</div>
-    <div class="field">
-      <label>Anthropic API Key (لـ Claude Canvas)</label>
-      <input type="password" id="api-key" placeholder="sk-ant-api03-...">
-      <div class="hint">من <strong>console.anthropic.com</strong> ← API Keys</div>
-    </div>
-    <div class="field">
-      <label>كلمة المرور (اختياري)</label>
-      <input type="password" id="new-pw" placeholder="اتركه فارغاً للإبقاء على الحالية">
-    </div>
-    <button class="btn btn-prime mt-2" onclick="saveSetup()"><span>حفظ والمتابعة ←</span></button>
-    <button class="btn btn-ghost mt-2" style="width:100%;margin-top:10px" onclick="skipSetup()">⏭ تخطي والدخول (بدون مفتاح)</button>
-    <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--muted)">بدون مفتاح يشتغل بالمولد المحلي المجاني</div>
-  </div>
-</div>
-
 <!-- ══════════ MAIN APP ══════════ -->
 <div id="app" class="hidden">
 
@@ -200,7 +169,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);hei
       <span class="chip chip-cyan" id="size-chip">1920×1080</span>
       <span class="chip chip-violet" id="fps-chip">30 fps</span>
       <span class="chip chip-green" id="mode-label">Canvas</span>
-      <button class="btn-icon" onclick="openSettings()" title="إعدادات">⚙️</button>
       <button class="btn-icon" onclick="lockApp()" title="قفل">🔒</button>
     </div>
   </header>
@@ -360,9 +328,8 @@ function unlock() {
   const v = document.getElementById('pw').value.trim();
   if (v === getStoredPw()) {
     hide('lock');
-    const k = localStorage.getItem('gs_key');
-    if (k) { S.apiKey = k; openApp(); }
-    else show('api-screen');
+    openApp();
+    toast('🎨', 'وضع مجاني — مولد المشاهد المحلي مفعّل');
   } else {
     const e = document.getElementById('pw-err');
     e.textContent = '❌ كلمة مرور خاطئة';
@@ -372,24 +339,6 @@ function unlock() {
 }
 
 function saveSetup() {
-  const k = document.getElementById('api-key').value.trim();
-  if (k && !k.startsWith('sk-ant-')) { toast('❌', 'المفتاح يجب أن يبدأ بـ sk-ant-'); return; }
-  if (k) { S.apiKey = k; localStorage.setItem('gs_key', k); }
-  const np = document.getElementById('new-pw').value.trim();
-  if (np.length >= 4) { localStorage.setItem('gs_pw', np); toast('✅', 'تم حفظ المفتاح وتحديث كلمة المرور'); }
-  else toast('✅', 'تم الحفظ');
-  hide('api-screen');
-  openApp();
-}
-
-function openSettings() {
-  document.getElementById('api-key').value = S.apiKey || '';
-  document.getElementById('new-pw').value = '';
-  show('api-screen');
-}
-
-function skipSetup() {
-  hide('api-screen');
   openApp();
   toast('🎨', 'وضع مجاني — مولد المشاهد المحلي مفعّل');
 }
@@ -1071,16 +1020,12 @@ window.addEventListener('resize', fitCanvas);
 document.addEventListener('keydown', e => {
   if (e.key !== 'Enter') return;
   if (!document.getElementById('lock').classList.contains('hidden')) unlock();
-  else if (!document.getElementById('api-screen').classList.contains('hidden')) saveSetup();
 });
 
 document.addEventListener('DOMContentLoaded', () => {
   // حماية: لازم الباسورد الأول قبل أي حاجة
   show('lock');
-  hide('api-screen');
   hide('app');
-  const k = localStorage.getItem('gs_key');
-  if (k) S.apiKey = k;
   console.log('%c🎬 GENESIS AI Video Studio Pro', 'color:#00d4ff;font-size:18px;font-weight:900');
   console.log('%cProtected build · Password required', 'color:#7c3aed;font-size:12px');
 });
