@@ -185,6 +185,8 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);hei
       <input type="password" id="new-pw" placeholder="اتركه فارغاً للإبقاء على الحالية">
     </div>
     <button class="btn btn-prime mt-2" onclick="saveSetup()"><span>حفظ والمتابعة ←</span></button>
+    <button class="btn btn-ghost mt-2" style="width:100%;margin-top:10px" onclick="skipSetup()">⏭ تخطي والدخول (بدون مفتاح)</button>
+    <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--muted)">بدون مفتاح يشتغل بالمولد المحلي المجاني</div>
   </div>
 </div>
 
@@ -384,6 +386,12 @@ function openSettings() {
   document.getElementById('api-key').value = S.apiKey || '';
   document.getElementById('new-pw').value = '';
   show('api-screen');
+}
+
+function skipSetup() {
+  hide('api-screen');
+  openApp();
+  toast('🎨', 'وضع مجاني — مولد المشاهد المحلي مفعّل');
 }
 
 function lockApp() {
@@ -1067,12 +1075,14 @@ document.addEventListener('keydown', e => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  hide('lock');
+  // حماية: لازم الباسورد الأول قبل أي حاجة
+  show('lock');
+  hide('api-screen');
+  hide('app');
   const k = localStorage.getItem('gs_key');
-  if (k) { S.apiKey = k; openApp(); }
-  else show('api-screen');
+  if (k) S.apiKey = k;
   console.log('%c🎬 GENESIS AI Video Studio Pro', 'color:#00d4ff;font-size:18px;font-weight:900');
-  console.log('%cPowered by Claude + Replicate', 'color:#7c3aed;font-size:12px');
+  console.log('%cProtected build · Password required', 'color:#7c3aed;font-size:12px');
 });
 </script>
 </body>
