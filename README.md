@@ -1,51 +1,73 @@
-# GENESIS AI Video Studio Pro
+# ⚡ CODEX — مولّد الكود الذكي
 
-نظام دمج بين Claude AI + Replicate لتوليد الفيديوهات
-
-## الميزات
-
-- **وضع Canvas:** Claude يحلل الفكرة + يعمل مشاهد JSON + Canvas يرسم + MediaRecorder يسجل فيديو WebM
-- **وضع Replicate:** إرسال البرومبت مباشرة لـ Luma Ray عبر Backend
-- **وضع DUAL (دمار):** Claude يحسن البرومبت أولاً وبعدين يبعته لـ Replicate
-- واجهة عربية احترافية مع شاشة قفل
-- تحسين البرومبت بـ Claude
-- تحكم كامل بالأبعاد والمدة والجودة
-
-## التثبيت
-
-```bash
-pip install -r requirements.txt
+## 🗂️ هيكل الملفات
+```
+codex-generator/
+├── index.html          ← نقطة الدخول
+├── package.json        ← الـ dependencies
+├── vite.config.js      ← إعدادات Vite
+├── netlify.toml        ← إعدادات Netlify
+├── .gitignore
+└── src/
+    ├── main.jsx        ← يشغّل الـ App
+    └── App.jsx         ← الكود الأساسي
 ```
 
-## التشغيل
+---
 
-### الحد الأدنى (Canvas فقط - بدون Backend):
-افتح `genesis_merged.html` مباشرة في المتصفح
+## 🚀 تشغيل محلياً (على جهازك)
 
-### مع Backend (Replicate):
+> متطلب: Node.js مثبت → [nodejs.org](https://nodejs.org)
 
 ```bash
-set REPLICATE_API_TOKEN=your_replicate_token_here
-python genesis_merged.py
+# 1. افتح Terminal في مجلد المشروع
+cd codex-generator
+
+# 2. ثبّت الـ packages
+npm install
+
+# 3. شغّل المشروع
+npm run dev
 ```
 
-أو على Linux/Mac:
+ثم افتح المتصفح على: **http://localhost:3000**
+
+---
+
+## ☁️ رفع على Vercel (مجاني)
+
+1. ارفع المجلد على GitHub
+2. روح [vercel.com](https://vercel.com) → Import Project
+3. Vercel هيعمل `npm run build` تلقائياً ✅
+
+## ☁️ رفع على Netlify (مجاني)
+
+**طريقة 1 — Drag & Drop:**
 ```bash
-export REPLICATE_API_TOKEN=your_replicate_token_here
-python genesis_merged.py
+npm run build   # بيعمل مجلد dist/
 ```
+ثم اسحب مجلد `dist/` على [netlify.com/drop](https://netlify.com/drop)
 
-افتح المتصفح على: `http://localhost:8000`
+**طريقة 2 — GitHub:**
+1. ارفع على GitHub
+2. Netlify → New Site → Import → اختار الـ repo
+3. Build command: `npm run build` | Publish dir: `dist`
 
-## الإعدادات المطلوبة
+---
 
-| المتغير | الوصف | مطلوب لـ |
-|---------|-------|----------|
-| `REPLICATE_API_TOKEN` | مفتاح Replicate API | وضع Replicate و DUAL |
-| `sk-ant-...` (في الواجهة) | مفتاح Anthropic API | وضع Canvas و تحسين البرومبت |
+## 🔑 API Key
 
-## ملاحظات
+عند فتح الموقع أول مرة، هيطلب منك Anthropic API Key.
 
-- مفتاح Anthropic يُحفظ في localStorage على جهازك فقط
-- مفتاح Replicate يُفضل كـ env variable على السيرفر
-- كلمة المرور الافتراضية: `G3n3$1s_Pr0!2026xQ`
+احصل عليه من: [console.anthropic.com](https://console.anthropic.com)
+- مجاني للاستخدام المحدود
+- الـ Key بيتحفظ في المتصفح فقط (localStorage) — مش بيتبعت لأي سيرفر
+
+---
+
+## ⚙️ Build للـ Production
+
+```bash
+npm run build
+# الناتج في مجلد dist/
+```
